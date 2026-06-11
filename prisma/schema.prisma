@@ -1,0 +1,35 @@
+generator client {
+    provider = "prisma-client-js"
+    binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  platform  String   // TWITCH, KICK, X
+  username  String
+  content   String
+  avatar    String?
+  channel   String?
+  hashtag   String?
+  timestamp DateTime @default(now())
+  metadata  Json?    @default("{}")
+
+  @@index([platform])
+  @@index([timestamp])
+  @@index([platform, timestamp])
+}
+
+model PlatformStats {
+  id              String   @id @default(cuid())
+  platform        String   @unique
+  totalMessages   Int      @default(0)
+  messagesPerMin  Float    @default(0)
+  isConnected     Boolean  @default(false)
+  lastMessageAt   DateTime?
+  updatedAt       DateTime @updatedAt
+}
